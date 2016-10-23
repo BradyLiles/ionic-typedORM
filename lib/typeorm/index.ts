@@ -13,6 +13,51 @@ export {Connection} from "./connection/Connection";
 export {ConnectionManager} from "./connection/ConnectionManager";
 export {ConnectionOptions} from "./connection/ConnectionOptions";
 
+export * from "./decorator/columns/Column";
+export * from "./decorator/columns/CreateDateColumn";
+export * from "./decorator/columns/DiscriminatorColumn";
+export * from "./decorator/columns/PrimaryGeneratedColumn";
+export * from "./decorator/columns/PrimaryColumn";
+export * from "./decorator/columns/UpdateDateColumn";
+export * from "./decorator/columns/VersionColumn";
+export * from "./decorator/listeners/AfterInsert";
+export * from "./decorator/listeners/AfterLoad";
+export * from "./decorator/listeners/AfterRemove";
+export * from "./decorator/listeners/AfterUpdate";
+export * from "./decorator/listeners/BeforeInsert";
+export * from "./decorator/listeners/BeforeRemove";
+export * from "./decorator/listeners/BeforeUpdate";
+export * from "./decorator/listeners/EventSubscriber";
+export * from "./decorator/options/ColumnOptions";
+export * from "./decorator/options/IndexOptions";
+export * from "./decorator/options/JoinColumnOptions";
+export * from "./decorator/options/JoinTableOptions";
+export * from "./decorator/options/RelationOptions";
+export * from "./decorator/options/TableOptions";
+export * from "./decorator/relations/RelationCount";
+export * from "./decorator/relations/JoinColumn";
+export * from "./decorator/relations/JoinTable";
+export * from "./decorator/relations/ManyToMany";
+export * from "./decorator/relations/ManyToOne";
+export * from "./decorator/relations/OneToMany";
+export * from "./decorator/relations/OneToOne";
+export * from "./decorator/relations/RelationCount";
+export * from "./decorator/relations/RelationId";
+export * from "./decorator/tables/Table";
+export * from "./decorator/tables/AbstractTable";
+export * from "./decorator/tables/ClassTableChild";
+export * from "./decorator/tables/ClosureTable";
+export * from "./decorator/tables/EmbeddableTable";
+export * from "./decorator/tables/SingleTableChild";
+export * from "./decorator/tables/Table";
+export * from "./decorator/tree/TreeLevelColumn";
+export * from "./decorator/tree/TreeParent";
+export * from "./decorator/Index";
+export * from "./decorator/NamingStrategy";
+export * from "./decorator/tables/TableInheritance";
+export * from "./decorator/Embedded";
+export * from "./decorator/DiscriminatorValue";
+
 // -------------------------------------------------------------------------
 // Commonly used functionality
 // -------------------------------------------------------------------------
@@ -49,14 +94,14 @@ export function getConnectionManager(): ConnectionManager {
  * it will try to create connection from environment variables.
  * There are several environment variables you can set:
  *
- * - TYPEORM_DRIVER_TYPE - driver type. Can be "mysql", "mysql2", "postgres", "mariadb", "sqlite", "oracle" or "mssql".
+ * - TYPEORM_DRIVER_TYPE - driver type. Can be "mysql", "mysql2", "postgres", "mariadb", "websql", "oracle" or "mssql".
  * - TYPEORM_URL - database connection url. Should be a string.
  * - TYPEORM_HOST - database host. Should be a string.
  * - TYPEORM_PORT - database access port. Should be a number.
  * - TYPEORM_USERNAME - database username. Should be a string.
  * - TYPEORM_PASSWORD - database user's password. Should be a string.
  * - TYPEORM_SID - database's SID. Used only for oracle databases. Should be a string.
- * - TYPEORM_STORAGE - database's storage url. Used only for sqlite databases. Should be a string.
+ * - TYPEORM_STORAGE - database's storage url. Used only for websql databases. Should be a string.
  * - TYPEORM_USE_POOL - indicates if connection pooling should be enabled. By default its enabled. Should be boolean-like value.
  * - TYPEORM_DRIVER_EXTRA - extra options to be passed to the driver. Should be a serialized json string of options.
  * - TYPEORM_AUTO_SCHEMA_SYNC - indicates if automatic schema synchronization will be performed on each application run. Should be boolean-like value.
@@ -70,25 +115,27 @@ export function getConnectionManager(): ConnectionManager {
  *
  * TYPEORM_DRIVER_TYPE variable is required. Depend on the driver type some other variables may be required too.
  */
-export function createConnection(): Promise<Connection>;
+// export function createConnection(): Promise<Connection>;
 
 /**
  * Creates connection from the given connection options and registers it in the manager.
  */
-export function createConnection(options?: ConnectionOptions): Promise<Connection>;
+export function createConnection(options: ConnectionOptions): Promise<Connection>{
+    return getConnectionManager().createAndConnect(options);
+};
 
 /**
  * Creates connection with the given connection name from the ormconfig.json file and registers it in the manager.
  * Optionally you can specify a path to custom ormconfig.json file.
  */
-export function createConnection(connectionNameFromConfig: string, ormConfigPath?: string): Promise<Connection>;
+// export function createConnection(connectionNameFromConfig: string, ormConfigPath?: string): Promise<Connection>;
 
 /**
  * Creates connection and and registers it in the manager.
  */
-export function createConnection(optionsOrConnectionNameFromConfig?: ConnectionOptions|string, ormConfigPath?: string): Promise<Connection> {
+/*export function createConnection(optionsOrConnectionNameFromConfig?: ConnectionOptions|string, ormConfigPath?: string): Promise<Connection> {
     return getConnectionManager().createAndConnect(optionsOrConnectionNameFromConfig as any, ormConfigPath);
-}
+}*/
 
 /**
  * Creates new connections and registers them in the manager.
@@ -100,14 +147,14 @@ export function createConnection(optionsOrConnectionNameFromConfig?: ConnectionO
  * it will try to create connection from environment variables.
  * There are several environment variables you can set:
  *
- * - TYPEORM_DRIVER_TYPE - driver type. Can be "mysql", "mysql2", "postgres", "mariadb", "sqlite", "oracle" or "mssql".
+ * - TYPEORM_DRIVER_TYPE - driver type. Can be "mysql", "mysql2", "postgres", "mariadb", "websql", "oracle" or "mssql".
  * - TYPEORM_URL - database connection url. Should be a string.
  * - TYPEORM_HOST - database host. Should be a string.
  * - TYPEORM_PORT - database access port. Should be a number.
  * - TYPEORM_USERNAME - database username. Should be a string.
  * - TYPEORM_PASSWORD - database user's password. Should be a string.
  * - TYPEORM_SID - database's SID. Used only for oracle databases. Should be a string.
- * - TYPEORM_STORAGE - database's storage url. Used only for sqlite databases. Should be a string.
+ * - TYPEORM_STORAGE - database's storage url. Used only for websql databases. Should be a string.
  * - TYPEORM_USE_POOL - indicates if connection pooling should be enabled. By default its enabled. Should be boolean-like value.
  * - TYPEORM_DRIVER_EXTRA - extra options to be passed to the driver. Should be a serialized json string of options.
  * - TYPEORM_AUTO_SCHEMA_SYNC - indicates if automatic schema synchronization will be performed on each application run. Should be boolean-like value.

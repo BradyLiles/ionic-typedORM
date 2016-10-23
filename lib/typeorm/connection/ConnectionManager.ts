@@ -8,6 +8,7 @@ import {AlreadyHasActiveConnectionError} from "./error/AlreadyHasActiveConnectio
 import {Logger} from "../logger/Logger";
 import {OrmUtils} from "../util/OrmUtils";
 import {CannotDetermineConnectionOptionsError} from "./error/CannotDetermineConnectionOptionsError";
+import {WebSqlDriver} from "../driver/websql/WebSqlDriver";
 
 /**
  * ConnectionManager is used to store and manage all these different connections.
@@ -112,14 +113,14 @@ export class ConnectionManager {
      * it will try to create connection from environment variables.
      * There are several environment variables you can set:
      *
-     * - TYPEORM_DRIVER_TYPE - driver type. Can be "mysql", "mysql2", "postgres", "mariadb", "sqlite", "oracle" or "mssql".
+     * - TYPEORM_DRIVER_TYPE - driver type. Can be "mysql", "mysql2", "postgres", "mariadb", "websql", "oracle" or "mssql".
      * - TYPEORM_URL - database connection url. Should be a string.
      * - TYPEORM_HOST - database host. Should be a string.
      * - TYPEORM_PORT - database access port. Should be a number.
      * - TYPEORM_USERNAME - database username. Should be a string.
      * - TYPEORM_PASSWORD - database user's password. Should be a string.
      * - TYPEORM_SID - database's SID. Used only for oracle databases. Should be a string.
-     * - TYPEORM_STORAGE - database's storage url. Used only for sqlite databases. Should be a string.
+     * - TYPEORM_STORAGE - database's storage url. Used only for websql databases. Should be a string.
      * - TYPEORM_USE_POOL - indicates if connection pooling should be enabled. By default its enabled. Should be boolean-like value.
      * - TYPEORM_DRIVER_EXTRA - extra options to be passed to the driver. Should be a serialized json string of options.
      * - TYPEORM_AUTO_SCHEMA_SYNC - indicates if automatic schema synchronization will be performed on each application run. Should be boolean-like value.
@@ -133,27 +134,21 @@ export class ConnectionManager {
      *
      * TYPEORM_DRIVER_TYPE variable is required. Depend on the driver type some other variables may be required too.
      */
-    async createAndConnect(): Promise<Connection>;
+    // async createAndConnect(): Promise<Connection>;
 
     /**
      * Creates connection from the given connection options and registers it in the manager.
      */
-    async createAndConnect(options: ConnectionOptions): Promise<Connection>;
-
-    /**
-     * Creates connection with the given connection name from the ormconfig.json file and registers it in the manager.
-     * Optionally you can specify a path to custom ormconfig.json file.
-     */
-    async createAndConnect(connectionNameFromConfig: string, ormConfigPath?: string): Promise<Connection>;
 
     /**
      * Creates connection and and registers it in the manager.
      */
-    async createAndConnect(optionsOrConnectionNameFromConfig?: ConnectionOptions|string, ormConfigPath?: string): Promise<Connection> {
+    async createAndConnect(connectionOptions: ConnectionOptions): Promise<Connection> {
 
         // if connection options are given, then create connection from them
-        if (optionsOrConnectionNameFromConfig && optionsOrConnectionNameFromConfig instanceof Object)
-            return this.createAndConnectByConnectionOptions(optionsOrConnectionNameFromConfig as ConnectionOptions);
+        if (connectionOptions && connectionOptions instanceof Object){
+            return this.createAndConnectByConnectionOptions(connectionOptions as ConnectionOptions);
+        }
 
         // if connection name is specified then explicitly try to load connection options from it
         // if (typeof optionsOrConnectionNameFromConfig === "string")
@@ -176,14 +171,14 @@ export class ConnectionManager {
      * it will try to create connection from environment variables.
      * There are several environment variables you can set:
      *
-     * - TYPEORM_DRIVER_TYPE - driver type. Can be "mysql", "mysql2", "postgres", "mariadb", "sqlite", "oracle" or "mssql".
+     * - TYPEORM_DRIVER_TYPE - driver type. Can be "mysql", "mysql2", "postgres", "mariadb", "websql", "oracle" or "mssql".
      * - TYPEORM_URL - database connection url. Should be a string.
      * - TYPEORM_HOST - database host. Should be a string.
      * - TYPEORM_PORT - database access port. Should be a number.
      * - TYPEORM_USERNAME - database username. Should be a string.
      * - TYPEORM_PASSWORD - database user's password. Should be a string.
      * - TYPEORM_SID - database's SID. Used only for oracle databases. Should be a string.
-     * - TYPEORM_STORAGE - database's storage url. Used only for sqlite databases. Should be a string.
+     * - TYPEORM_STORAGE - database's storage url. Used only for websql databases. Should be a string.
      * - TYPEORM_USE_POOL - indicates if connection pooling should be enabled. By default its enabled. Should be boolean-like value.
      * - TYPEORM_DRIVER_EXTRA - extra options to be passed to the driver. Should be a serialized json string of options.
      * - TYPEORM_AUTO_SCHEMA_SYNC - indicates if automatic schema synchronization will be performed on each application run. Should be boolean-like value.
@@ -350,6 +345,8 @@ export class ConnectionManager {
      */
     protected createDriver(options: DriverOptions, logger: Logger): Driver {
         switch (options.type) {
+            case "websql":
+                return new WebSqlDriver(options, logger);
             default:
                 throw new MissingDriverError(options.type);
         }
